@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Car Model Finder (CarQuery API - Final)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .car-card {
+      border: 1px solid #ccc;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Search Car Models by Brand</h1>
+  <input type="text" id="brandInput" placeholder="e.g. honda">
+  <button onclick="searchModels()">Search</button>
+
+  <div id="results"></div>
+
+  <script>
+    async function searchModels() {
+      const brand = document.getElementById('brandInput').value.trim().toLowerCase();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<p>Loading...</p>';
+
+      if (!brand) {
+        resultsDiv.innerHTML = '<p>Please enter a brand name.</p>';
+        return;
+      }
+
+      try {
+        const res = await fetch(`proxy.php?make=${encodeURIComponent(brand)}`);
+        const text = await res.text();
+
+        // Auto-detect and parse JSON or JSONP
+        let json;
+        try {
+          if (text.startsWith('carquerycallback(')) {
+            json = JSON.parse(text.replace(/^.*?\(/, '').replace(/\);$/, ''));
+          } else {
+            json = JSON.parse(text);
+          }
+        } catch (e) {
+          console.error('Failed to parse response:', text);
+          resultsDiv.innerHTML = '<p>Error parsing data from server.</p>';
+          return;
+        }
+
+        const trims = json.Trims;
+
+        if (!trims || trims.length === 0) {
+          resultsDiv.innerHTML = `<p>No results found for "${brand}".</p>`;
+          return;
+        }
+
+        resultsDiv.innerHTML = `<h3>${trims.length} models found for "${brand}":</h3>`;
+
+        trims.forEach(car => {
+          const make = car.make_display?.trim();
+          const model = car.model_name?.trim();
+          const year = car.model_year;
+          const body = car.model_body?.trim() || '';
+
+          // Only show entries with required fields
+          if (!make || !model || !year) return;
+
+          const div = document.createElement('div');
+          div.className = 'car-card';
+          div.innerHTML = `
+            <strong>${make} ${model}</strong> (${year})<br>
+            Body: ${body || 'Unknown'}
+            <form action="save.php" method="POST">
+              <input type="hidden" name="make" value="${make}">
+              <input type="hidden" name="model" value="${model}">
+              <input type="hidden" name="year" value="${year}">
+              <input type="hidden" name="class" value="${body}">
+              <button type="submit">Save</button>
+            </form>
+          `;
+          resultsDiv.appendChild(div);
+        });
+      } catch (err) {
+        resultsDiv.innerHTML = '<p>Error fetching car data. Try again later.</p>';
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
+

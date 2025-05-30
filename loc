@@ -1,0 +1,7 @@
+sudo cp -r ~/codes/car-finder/* /srv/http/car-finder/
+sudo chown -R http:http /srv/http/car-finder
+
+user: pmauser
+password: pdzl
+
+api: 6XTLn36+KV4+RR0cO1QKSQ==1KSfd01KKas0APFg
