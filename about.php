@@ -13,10 +13,16 @@
 </head>
 </html>
 <body>
-    <div class="m-5 p-5" style="border: rgb(255, 0, 0)"> 
+    <div class="m-5 p-5"> 
         <h1 class="text-lg">About</h1>
+        <div>A webpage used to search cars that a brand has.</div>
         <hr>
         <div>Jase Karl Rosales Janiola</div>
         <div>Sundy Eupena Pasa</div>
+        <div class="mt-5">
+            <form action="index.html" method="get">
+                <button class="btn btn-outline-success" type="submit">Back</button>
+            </form>
+        </div>
     </div>
 </body>
