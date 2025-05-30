@@ -66,14 +66,19 @@
 
         resultsDiv.innerHTML = `<h3>${trims.length} models found for "${brand}":</h3>`;
 
+        const shown = new Set();
+
         trims.forEach(car => {
           const make = car.make_display?.trim();
           const model = car.model_name?.trim();
           const year = car.model_year;
           const body = car.model_body?.trim() || '';
 
-          // Only show entries with required fields
           if (!make || !model || !year) return;
+
+          const key = `${make}_${model}_${year}`;
+          if (shown.has(key)) return; // skip duplicates
+          shown.add(key);
 
           const div = document.createElement('div');
           div.className = 'car-card';
